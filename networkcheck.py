@@ -7,8 +7,9 @@ import socket
 import json
 import time
 
+print("Initialising ...")
 
-def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elapsedTime, serverName, serverLocation, hostname, currentNetwork):
+def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elapsedTime, serverName, serverLocation, hostname, networkSSID, physicalLocation):
     payload = {
         "type": "message",
         "attachments": [
@@ -21,7 +22,7 @@ def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elaps
                             "type": "TextBlock",
                             "size": "Large",
                             "weight": "Bolder",
-                            "text": f"⚡ Speedtest Data - {hostname} via {currentNetwork}"
+                            "text": f"⚡ Speedtest Data - {hostname} via {networkSSID}"
                         },
                         {
                             "type": "TextBlock",
@@ -52,6 +53,10 @@ def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elaps
                         {
                             "type": "TextBlock",
                             "text": f"🌍 **Country:** {serverLocation}"
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": f"🏢 **Physical Location:** {physicalLocation}"
                         }
                     ]
                 }
@@ -60,6 +65,7 @@ def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elaps
     }
 
     requests.post(credentials.webhookurl, data=json.dumps(payload))
+    print("Request Sent.")
 
 
 def runTest():
@@ -81,13 +87,18 @@ def runTest():
     elapsedTime = endTime - startTime
     currentTime = datetime.datetime.now()
 
-    sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], localHostname, currentNetwork)
+    print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed TIme: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}Hostname:{localHostname}")
+    sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], localHostname, credentials.ssid, credentials.location)
 
 
 schedule.every().day.at("09:00").do(runTest)
+print("[LIVE] Schedule Everyday at 09:00")
 schedule.every().day.at("13:00").do(runTest)
+print("[LIVE] Schedule Everyday at 13:00")
 schedule.every().day.at("17:00").do(runTest)
+print("[LIVE] Schedule Everyday at 17:00")
 
+print("Running...")
 while True:
     schedule.run_pending()
     time.sleep(60)
