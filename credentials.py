@@ -6,3 +6,5 @@ ssid = "Unset"
 location = "Unset"
 # Test Mode - Triggers a speedtest on boot
 testmode = False
+# Device Name
+devicename = "Unset"
