@@ -3,7 +3,6 @@ import speedtest
 import datetime
 import schedule
 import requests
-import socket
 import json
 import time
 
@@ -81,13 +80,12 @@ def runTest():
     downloadResult = str(f"{downloadResultRAW / 1024 / 1024:.2f}Mbit/s")
     uploadResult = str(f"{uploadResultRAW / 1024 / 1024:.2f}Mbit/s")
     pingResult = str(f"{pingResultRAW}ms")
-    localHostname = socket.gethostname()
     endTime = time.time()
     elapsedTime = endTime - startTime
     currentTime = datetime.datetime.now()
 
-    print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed TIme: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}Hostname:{localHostname}")
-    sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], localHostname, credentials.ssid, credentials.location)
+    print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed TIme: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}\nDevice:{credentials.deviename}\nLocal Network: {credentials.ssid}")
+    sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], credentials.devicename, credentials.ssid, credentials.location)
 
 
 schedule.every().day.at("09:00").do(runTest)
