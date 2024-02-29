@@ -71,8 +71,7 @@ def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elaps
 def runTest():
     startTime = time.time()
     test = speedtest.Speedtest()
-    servers = [19019]
-    test.get_servers(servers)
+    test.get_servers()
     bestServer = test.get_best_server()
 
     downloadResultRAW = test.download()
