@@ -98,6 +98,11 @@ print("[LIVE] Schedule Everyday at 13:00")
 schedule.every().day.at("17:00").do(runTest)
 print("[LIVE] Schedule Everyday at 17:00")
 
+if credentials.testmode == True:
+    print("Test Mode Enabled... Testing..")
+    runTest()
+    print("Test Complete... Continuing as normal")
+
 print("Running...")
 while True:
     schedule.run_pending()
