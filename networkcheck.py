@@ -84,7 +84,7 @@ def runTest():
     elapsedTime = endTime - startTime
     currentTime = datetime.datetime.now()
 
-    print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed TIme: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}\nDevice:{credentials.deviename}\nLocal Network: {credentials.ssid}")
+    print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed TIme: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}\nDevice:{credentials.devicename}\nLocal Network: {credentials.ssid}")
     sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], credentials.devicename, credentials.ssid, credentials.location)
 
 
