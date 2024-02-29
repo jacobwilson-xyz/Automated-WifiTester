@@ -4,3 +4,5 @@ webhookurl = "Unset"
 ssid = "Unset"
 # Physical Building Location
 location = "Unset"
+# Test Mode - Triggers a speedtest on boot
+testmode = False
