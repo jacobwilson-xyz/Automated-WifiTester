@@ -63,7 +63,7 @@ def sendWebhookNotificationLinux(ping, downloadSpeed, uploadSpeed, currentTime, 
                 "value": f"{wlanRate}"
             },{
                 "name": "📈 Signal Quality",
-                "value": f"{wlanQualityPercent}"
+                "value": f"{wlanQualityPercent}%"
             },{
                 "name": "📶 Signal Strength",
                 "value": f"{wlanSignalStrength}"
