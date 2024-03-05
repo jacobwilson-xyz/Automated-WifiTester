@@ -40,7 +40,7 @@ def runTest():
         wlanSignalStrength = wlan.split("Signal level=", 1)[1].split(" dBm")[0] + "dBm"
 
 
-    test = speedtest.Speedtest()
+    test = speedtest.Speedtest(secure=True)
     test.get_servers()
     bestServer = test.get_best_server()
 

@@ -41,7 +41,7 @@ def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elaps
         }]
     }
 
-    requests.post(config.webhookurl, data=json.dumps(payload))
+    requests.post(config.webhookURL, data=json.dumps(payload))
     print("Request Sent.")
     return
 
@@ -96,6 +96,6 @@ def sendWebhookNotificationLinux(ping, downloadSpeed, uploadSpeed, currentTime, 
         }]
     }
 
-    requests.post(config.webhookurl, data=json.dumps(payload))
+    requests.post(config.webhookURL, data=json.dumps(payload))
     print("Request Sent (Linux)")
     return
