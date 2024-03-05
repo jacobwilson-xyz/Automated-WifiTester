@@ -108,6 +108,8 @@ schedule.every().day.at("13:00").do(runNetworkCheck)
 print("[LIVE] Schedule Everyday at 13:00")
 schedule.every().day.at("17:00").do(runNetworkCheck)
 print("[LIVE] Schedule Everyday at 17:00")
+schedule.every().day.at("01:00").do(runNetworkCheck)
+print("[LIVE] Schedule Everyday at 01:00")
 
 if config.testMode == True:
     print("Test Mode Enabled... Testing..")
