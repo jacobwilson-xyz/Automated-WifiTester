@@ -15,3 +15,8 @@ deviceName = "Unset"
 systemPlatform = platform.system()
 # Which wlan to use for testing - For Linux
 wlan = "wlan1"
+# Display IP on startup for SSH Purposes (Linux).
+displayDeviceIP = False
+encodeDeviceIP = False
+# Random UUID each session for better tracking of mutliple devices
+uniqueIdentifer = str(uuid.uuid4())[:4]
