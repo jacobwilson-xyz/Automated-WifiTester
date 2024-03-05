@@ -1,74 +1,44 @@
-import credentials
+import webhookSender
+import config
+import subprocess
 import speedtest
 import datetime
 import schedule
-import requests
-import json
 import time
+import sys
 
 print("Initialising ...")
 
-def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elapsedTime, serverName, serverLocation, hostname, networkSSID, physicalLocation):
-    payload = {
-        "type": "message",
-        "attachments": [
-            {
-                "contentType": "application/vnd.microsoft.card.adaptive",
-                "content": {
-                    "type": "AdaptiveCard",
-                    "body": [
-                        {
-                            "type": "TextBlock",
-                            "size": "Large",
-                            "weight": "Bolder",
-                            "text": f"⚡ Speedtest Data - {hostname} via {networkSSID}"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "size": "Medium",
-                            "weight": "Bolder",
-                            "text": f"💓 **Ping:** {ping}"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "text": f"⬇️ **Download:** {downloadSpeed}"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "text": f"⬆️ **Upload:** {uploadSpeed}"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "text": f"🕒 **Time:** {currentTime}"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "text": f"⏱️ **Elapsed:** {elapsedTime}s"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "text": f"🖥️ **Host:** {serverName}"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "text": f"🌍 **Country:** {serverLocation}"
-                        },
-                        {
-                            "type": "TextBlock",
-                            "text": f"🏢 **Physical Location:** {physicalLocation}"
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+def systemCompatitbilityCheck():
+    if config.systemPlatform != "Windows" or config.systemPlatform != "Linux":
+        print("Unsupported Operating System. Exiting...")
+        time.sleep(3)
+        sys.exit()
+    else:
+        print(f"{config.systemPlatform} OS Identified, continuing")
+        return
 
-    requests.post(credentials.webhookurl, data=json.dumps(payload))
-    print("Request Sent.")
-
-
+print("Checking system ...")  
+systemCompatitbilityCheck()
 def runTest():
     startTime = time.time()
+
+    if config.systemPlatform == "Linux":
+        iwRAW = subprocess.run('iwconfig', capture_output=True, text=True)
+        iwOut = iwRAW.stdout
+
+        wlan = iwOut.split(config.wlan, 1)[1]
+
+        wlanSSID = wlan.split("ESSID:", 1)[1].split("Mode", 1)[0].split("\"")[1].split("\"\n")[0]
+        wlanFreq = wlan.split("Frequency:", 1)[1].split("GHz", 1)[0] + "GHz"
+        wlanRate = wlan.split("Bit Rate=", 1)[1].split("Mb/s", 1)[0] + "Mb/s"
+        wlanQuality = wlan.split("Link Quality=", 1)[1].split("Signal level", 1)[0].split(" ", 1)[0]
+        wlanQualityFirst = wlanQuality.split("/")[0]
+        wlanQualitySecond = wlanQuality.split("/")[1]
+        wlanQualityPercent = round(int(wlanQualityFirst) / int(wlanQualitySecond) * 100, 1)
+        wlanSignalStrength = wlan.split("Signal level=", 1)[1].split(" dBm")[0] + "dBm"
+
+
     test = speedtest.Speedtest()
     test.get_servers()
     bestServer = test.get_best_server()
@@ -84,8 +54,13 @@ def runTest():
     elapsedTime = endTime - startTime
     currentTime = datetime.datetime.now()
 
-    print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed TIme: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}\nDevice:{credentials.devicename}\nLocal Network: {credentials.ssid}")
-    sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], credentials.devicename, credentials.ssid, credentials.location)
+    print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed Time: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}\nDevice:{config.deviceName}\nLocal Network: {config.ssid}")
+    if config.systemPlatform == "Linux":
+        webhookSender.sendWebhookNotificationLinux(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, wlanSSID, config.location, wlanFreq, wlanRate, wlanQualityPercent, wlanSignalStrength)
+    else:
+        webhookSender.sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, config.ssid, config.location)
+    print("Complete. Returning to Schedule")
+    return
 
 
 schedule.every().day.at("09:00").do(runTest)
@@ -95,7 +70,7 @@ print("[LIVE] Schedule Everyday at 13:00")
 schedule.every().day.at("17:00").do(runTest)
 print("[LIVE] Schedule Everyday at 17:00")
 
-if credentials.testmode == True:
+if config.testMode == True:
     print("Test Mode Enabled... Testing..")
     runTest()
     print("Test Complete... Continuing as normal")
