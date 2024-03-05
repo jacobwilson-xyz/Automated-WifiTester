@@ -9,14 +9,15 @@ import sys
 
 print("Initialising ...")
 
+
 def systemCompatitbilityCheck():
-    if config.systemPlatform != "Windows" or config.systemPlatform != "Linux":
-        print("Unsupported Operating System. Exiting...")
-        time.sleep(3)
-        sys.exit()
-    else:
+    if config.systemPlatform in ['Windows', 'Linux']:
         print(f"{config.systemPlatform} OS Identified, continuing")
         return
+    else:
+        print(f"Unsupported Operating System: {config.systemPlatform} Exiting...")
+        sys.exit()
+        
 
 print("Checking system ...")  
 systemCompatitbilityCheck()
