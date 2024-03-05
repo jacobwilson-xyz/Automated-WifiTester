@@ -45,7 +45,7 @@ def runNetworkCheck():
         wlanSignalStrength = wlan.split("Signal level=", 1)[1].split(" dBm")[0] + "dBm"
 
         if config.displayDeviceIP:
-            ipRAW = subprocess.run('hostname -I', capture_output=True, text=True)
+            ipRAW = subprocess.run(['hostname', '-I'], capture_output=True, text=True)
             ipOUT = ipRAW.stdout
             if config.encodeDeviceIP:
                 ipEncoded = ipOUT.encode('utf-8')
