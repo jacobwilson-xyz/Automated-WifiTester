@@ -4,11 +4,12 @@ import subprocess
 import speedtest
 import datetime
 import schedule
+import socket
+import base64
 import time
 import sys
 
 print("Initialising ...")
-
 
 def systemCompatitbilityCheck():
     if config.systemPlatform in ['Windows', 'Linux']:
@@ -17,14 +18,18 @@ def systemCompatitbilityCheck():
     else:
         print(f"Unsupported Operating System: {config.systemPlatform} Exiting...")
         sys.exit()
-        
+
 
 print("Checking system ...")  
 systemCompatitbilityCheck()
-def runTest():
+
+testComplete = False
+
+def runNetworkCheck():
     startTime = time.time()
 
     if config.systemPlatform == "Linux":
+        ipOUT = ""
         iwRAW = subprocess.run('iwconfig', capture_output=True, text=True)
         iwOut = iwRAW.stdout
 
@@ -39,6 +44,33 @@ def runTest():
         wlanQualityPercent = round(int(wlanQualityFirst) / int(wlanQualitySecond) * 100, 1)
         wlanSignalStrength = wlan.split("Signal level=", 1)[1].split(" dBm")[0] + "dBm"
 
+        if config.displayDeviceIP:
+            ipRAW = subprocess.run('hostname -I', capture_output=True, text=True)
+            ipOUT = ipRAW.stdout
+            if config.encodeDeviceIP:
+                ipEncoded = ipOUT.encode('utf-8')
+                ipEncoded = base64.b64encode(ipEncoded)
+                ipOUT = ipEncoded.decode('utf-8')
+                print("IP Address Encoded...")
+        else:
+            ipOUT = "Hidden"
+
+
+    if config.systemPlatform == "Windows":
+        ipOUT = ""
+        if config.displayDeviceIP:
+            ipRAW = socket.gethostbyname_ex(socket.gethostname())[-1]
+            if config.encodeDeviceIP:
+                ipRAW = [base64.b64encode(s.encode('utf-8')).decode('utf-8') for s in ipRAW]
+                print("IP Address Encoded...")
+
+            for ips in ipRAW:
+                ipOUT = ipOUT + f"{ips} "
+            
+        else:
+            ipOUT = "Hidden"
+    
+    print(f"Running on {ipOUT}")
 
     test = speedtest.Speedtest(secure=True)
     test.get_servers()
@@ -57,23 +89,29 @@ def runTest():
 
     print(f"Ping: {pingResult}\nDownload: {downloadResult}\nUpload: {uploadResult}\nCurrent Time: {currentTime}\nElapsed Time: {round(elapsedTime, 2)}\nHost: {bestServer['host']}\nCountry:{bestServer['country']}\nDevice:{config.deviceName}\nLocal Network: {config.ssid}")
     if config.systemPlatform == "Linux":
-        webhookSender.sendWebhookNotificationLinux(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, wlanSSID, config.location, wlanFreq, wlanRate, wlanQualityPercent, wlanSignalStrength)
+        if config.testMode is True and testComplete is False:
+            webhookSender.sendTestWebhookLinux(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, wlanSSID, config.location, wlanFreq, wlanRate, wlanQualityPercent, wlanSignalStrength, ipOUT)
+        else:
+            webhookSender.sendWebhookNotificationLinux(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, wlanSSID, config.location, wlanFreq, wlanRate, wlanQualityPercent, wlanSignalStrength)
     else:
-        webhookSender.sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, config.ssid, config.location)
+        if config.testMode is True and testComplete is False:
+            webhookSender.sendTestWebhook(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, config.ssid, config.location, ipOUT)
+        else:
+            webhookSender.sendWebhookNotification(pingResult, downloadResult, uploadResult, currentTime, round(elapsedTime, 2), bestServer['host'], bestServer['country'], config.deviceName, config.ssid, config.location)
     print("Complete. Returning to Schedule")
     return
 
 
-schedule.every().day.at("09:00").do(runTest)
+schedule.every().day.at("09:00").do(runNetworkCheck)
 print("[LIVE] Schedule Everyday at 09:00")
-schedule.every().day.at("13:00").do(runTest)
+schedule.every().day.at("13:00").do(runNetworkCheck)
 print("[LIVE] Schedule Everyday at 13:00")
-schedule.every().day.at("17:00").do(runTest)
+schedule.every().day.at("17:00").do(runNetworkCheck)
 print("[LIVE] Schedule Everyday at 17:00")
 
 if config.testMode == True:
     print("Test Mode Enabled... Testing..")
-    runTest()
+    runNetworkCheck()
     print("Test Complete... Continuing as normal")
 
 print("Running...")
