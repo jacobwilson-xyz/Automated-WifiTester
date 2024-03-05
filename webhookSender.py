@@ -26,7 +26,7 @@ def sendWebhookNotification(ping, downloadSpeed, uploadSpeed, currentTime, elaps
                 "value": f"{currentTime}"
             }, {
                 "name": "⏱️ Elapsed",
-                "value": f"{elapsedTime}"
+                "value": f"{elapsedTime}s"
             }, {
                 "name": "🖥️ Host",
                 "value": f"{serverName}"
@@ -81,7 +81,7 @@ def sendWebhookNotificationLinux(ping, downloadSpeed, uploadSpeed, currentTime, 
                 "value": f"{currentTime}"
             }, {
                 "name": "⏱️ Elapsed",
-                "value": f"{elapsedTime}"
+                "value": f"{elapsedTime}s"
             }, {
                 "name": "🖥️ Host",
                 "value": f"{serverName}"
@@ -124,7 +124,7 @@ def sendTestWebhook(ping, downloadSpeed, uploadSpeed, currentTime, elapsedTime, 
                 "value": f"{currentTime}"
             }, {
                 "name": "⏱️ Elapsed",
-                "value": f"{elapsedTime}"
+                "value": f"{elapsedTime}s"
             }, {
                 "name": "🌐 SSID",
                 "value": f"{networkSSID}"
@@ -185,7 +185,7 @@ def sendTestWebhookLinux(ping, downloadSpeed, uploadSpeed, currentTime, elapsedT
                 "value": f"{currentTime}"
             }, {
                 "name": "⏱️ Elapsed",
-                "value": f"{elapsedTime}"
+                "value": f"{elapsedTime}s"
             }, {
                 "name": "🌐 SSID",
                 "value": f"{networkSSID}"
