@@ -1,15 +1,16 @@
 import platform
+import uuid
 
 # Webhook URL for POST Requests
-webhookURL = "WebhookURL"
+webhookURL = "Webhook URL"
 # Network SSID - Set automatically on Linux
-ssid = "UniOfCam-IoT"
+ssid = "SSID"
 # Physical Building Location
-location = "Room XX"
+location = "Location"
 # Test Mode - Triggers a speedtest on boot
-testMode = False
+testMode = True
 # Device Name
-deviceName = "Unset"
+deviceName = "Device"
 # Runtime interval in seconds
 testInterval = 3600
 # Device OS Name, 'Linux' or 'Windows' supported. You can use systemPlatform = "Linux"
