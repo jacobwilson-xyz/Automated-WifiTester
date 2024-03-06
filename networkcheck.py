@@ -3,7 +3,6 @@ import config
 import subprocess
 import speedtest
 import datetime
-import schedule
 import socket
 import base64
 import time
@@ -70,7 +69,7 @@ def runNetworkCheck():
         else:
             ipOUT = "Hidden"
     
-    print(f"Running on {ipOUT}")
+    print(f"Running on address: {ipOUT}")
 
     test = speedtest.Speedtest(secure=True)
     test.get_servers()
@@ -101,23 +100,16 @@ def runNetworkCheck():
     print("Complete. Returning to Schedule")
     return
 
-
-schedule.every().day.at("09:00").do(runNetworkCheck)
-print("[LIVE] Schedule Everyday at 09:00")
-schedule.every().day.at("13:00").do(runNetworkCheck)
-print("[LIVE] Schedule Everyday at 13:00")
-schedule.every().day.at("17:00").do(runNetworkCheck)
-print("[LIVE] Schedule Everyday at 17:00")
-schedule.every().day.at("01:00").do(runNetworkCheck)
-print("[LIVE] Schedule Everyday at 01:00")
-
 if config.testMode == True:
-    print("Test Mode Enabled... Testing..")
+    print("Test Mode Enabled. Testing...")
     runNetworkCheck()
+    testComplete = True
     print("Test Complete... Continuing as normal")
 
-print("Running...")
+print(f"Running on a {round(config.testInterval / 3600, 1)}hr interval...")
 while True:
-    schedule.run_pending()
-    time.sleep(60)
- 
+    time.sleep(config.testInterval)
+    print(f"[Test Running] {datetime.datetime.now()}")
+    runNetworkCheck()
+    print(f"[Test Complete] {datetime.datetime.now()}")
+    print("[Test Complete] Continuing Cycle")
