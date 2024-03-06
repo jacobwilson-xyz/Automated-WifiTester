@@ -2,19 +2,20 @@ import platform
 
 # Webhook URL for POST Requests
 webhookURL = "WebhookURL"
-# Network SSID - Set automatically
+# Network SSID - Set automatically on Linux
 ssid = "UniOfCam-IoT"
 # Physical Building Location
-location = "Room X00"
+location = "Room XX"
 # Test Mode - Triggers a speedtest on boot
 testMode = False
 # Device Name
 deviceName = "Unset"
-# Device OS Name, 'Linux' or 'Windows' supported.
-# systemPlatform = "Linux"
+# Runtime interval in seconds
+testInterval = 3600
+# Device OS Name, 'Linux' or 'Windows' supported. You can use systemPlatform = "Linux"
 systemPlatform = platform.system()
 # Which wlan to use for testing - For Linux
-wlan = "wlan1"
+wlan = "wlan0"
 # Display IP on startup for SSH Purposes (Linux).
 displayDeviceIP = False
 encodeDeviceIP = False
